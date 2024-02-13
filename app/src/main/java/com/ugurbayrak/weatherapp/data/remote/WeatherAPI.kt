@@ -2,7 +2,7 @@ package com.ugurbayrak.weatherapp.data.remote
 
 import com.ugurbayrak.weatherapp.data.remote.dto.forecast.ForecastResponse
 import com.ugurbayrak.weatherapp.data.remote.dto.weather.WeatherResponse
-import com.ugurbayrak.weatherapp.util.Constants.API_KEY
+import com.ugurbayrak.weatherapp.util.ApiKey.API_KEY
 import com.ugurbayrak.weatherapp.util.Constants.UNITS
 import retrofit2.Response
 import retrofit2.http.GET
@@ -23,5 +23,5 @@ interface WeatherAPI {
         @Query("lon") lon: Double = 35.3904988,
         @Query("units") units: String = UNITS,
         @Query("appid") appId: String = API_KEY
-    ) : Response<List<ForecastResponse>>
+    ) : Response<ForecastResponse>
 }
