@@ -1,12 +1,13 @@
 package com.ugurbayrak.weatherapp.data.util
 
-import androidx.room.util.getColumnIndex
 import com.ugurbayrak.weatherapp.data.remote.dto.forecast.ForecastResponse
 import com.ugurbayrak.weatherapp.data.remote.dto.weather.WeatherResponse
-import com.ugurbayrak.weatherapp.domain.model.Forecast
+import com.ugurbayrak.weatherapp.domain.model.DailyForecast
+import com.ugurbayrak.weatherapp.domain.model.HourlyForecast
 import com.ugurbayrak.weatherapp.domain.model.Weather
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
-import kotlin.math.roundToInt
 
 fun WeatherResponse.toWeather() : Weather {
     return Weather(
@@ -24,9 +25,9 @@ fun WeatherResponse.toWeather() : Weather {
     )
 }
 
-fun ForecastResponse.toForecast() : List<Forecast> {
+fun ForecastResponse.toHourlyForecast() : List<HourlyForecast> {
     return list.map {
-        Forecast(
+        HourlyForecast(
             temp = formatTemperature(it.main.temp),
             pop = "%" + (it.pop * 100).toInt().toString(),
             dtTxt = getHour(it.dt_txt),
@@ -34,6 +35,84 @@ fun ForecastResponse.toForecast() : List<Forecast> {
         )
     }
 }
+
+fun ForecastResponse.toDailyForecast() : List<DailyForecast> {
+    val forecastList = list.map {
+        DailyForecastDummy(
+            tempMin = it.main.temp_min,
+            tempMax = it.main.temp_max,
+            pop = it.pop,
+            dtTxt = it.dt_txt,
+            icon = it.weather[0].icon
+        )
+    }
+
+    return formatDailyForecast(forecastList).map {
+        DailyForecast(
+            tempMin = formatTemperature(it.tempMin),
+            tempMax = formatTemperature(it.tempMax),
+            pop = "%" + (it.pop * 100).toInt().toString(),
+            day = getDayOfWeek(it.dtTxt),
+            icon = get2xIconUrl(it.icon),
+            iconNight = get2xIconUrl(it.iconNight),
+        )
+    }
+}
+
+private data class DailyForecastDummy(
+    val tempMin: Double,
+    val tempMax: Double,
+    val pop: Double,
+    val dtTxt: String,
+    val icon: String,
+    val iconNight: String = "",
+)
+
+private fun formatDailyForecast(forecastList: List<DailyForecastDummy>): List<DailyForecastDummy> {
+    val dailyGroups = forecastList.groupBy { it.dtTxt.substringBefore(" ").trim() }
+
+    val dailyForecastList = dailyGroups.map { (date, dailyForecast) ->
+        val tempMin = dailyForecast.minOf { it.tempMin }
+        val tempMax = dailyForecast.maxOf { it.tempMax }
+        val pop = dailyForecast.maxOf { it.pop }
+        val icon = dailyForecast.find { it.dtTxt.endsWith("12:00:00") }?.icon ?: dailyForecast[0].icon
+        val iconNight = dailyForecast.find { it.dtTxt.endsWith("18:00:00") }?.icon ?: dailyForecast[0].icon
+        DailyForecastDummy(tempMin, tempMax, pop, date, icon, iconNight)
+    }
+
+    return dailyForecastList
+}
+
+private fun getDayOfWeek(date: String) : String{
+    val today = Calendar.getInstance()
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+    val calendar = Calendar.getInstance()
+    calendar.time = dateFormat.parse(date)!!
+
+    val dayOfWeek = when (calendar.get(Calendar.DAY_OF_WEEK)) {
+        Calendar.SUNDAY -> "Sunday"
+        Calendar.MONDAY -> "Monday"
+        Calendar.TUESDAY -> "Tuesday"
+        Calendar.WEDNESDAY -> "Wednesday"
+        Calendar.THURSDAY -> "Thursday"
+        Calendar.FRIDAY -> "Friday"
+        Calendar.SATURDAY -> "Saturday"
+        else -> "Unknown"
+    }
+
+    val isToday = today.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) &&
+            today.get(Calendar.DAY_OF_YEAR) == calendar.get(Calendar.DAY_OF_YEAR)
+
+    val day = if (isToday) {
+        "Today"
+    } else {
+        dayOfWeek
+    }
+
+    return day
+}
+
 
 private fun get2xIconUrl(icon: String) = "https://openweathermap.org/img/wn/${icon}@2x.png"
 

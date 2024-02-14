@@ -5,7 +5,7 @@
     <data>
         <variable
             name="forecast"
-            type="com.ugurbayrak.weatherapp.domain.model.Forecast" />
+            type="com.ugurbayrak.weatherapp.domain.model.HourlyForecast" />
     </data>
 
     <LinearLayout
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:background="#00000000"
             android:text="@{forecast.temp}"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:layout_marginBottom="8dp" />
 
         <LinearLayout

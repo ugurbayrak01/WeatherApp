@@ -8,25 +8,24 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ugurbayrak.weatherapp.R
 import com.ugurbayrak.weatherapp.databinding.HourlyForecastColumnBinding
-import com.ugurbayrak.weatherapp.domain.model.Forecast
+import com.ugurbayrak.weatherapp.domain.model.HourlyForecast
 
 class HourlyForecastRecyclerAdapter : RecyclerView.Adapter<HourlyForecastRecyclerAdapter.HourlyForecastViewHolder>() {
 
     class HourlyForecastViewHolder(var binding: HourlyForecastColumnBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private val diffUtil = object : DiffUtil.ItemCallback<Forecast>() {
-        override fun areItemsTheSame(oldItem: Forecast, newItem: Forecast): Boolean {
+    private val diffUtil = object : DiffUtil.ItemCallback<HourlyForecast>() {
+        override fun areItemsTheSame(oldItem: HourlyForecast, newItem: HourlyForecast): Boolean {
             return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: Forecast, newItem: Forecast): Boolean {
+        override fun areContentsTheSame(oldItem: HourlyForecast, newItem: HourlyForecast): Boolean {
             return oldItem == newItem
         }
-
     }
     private val recyclerListDiffer = AsyncListDiffer(this, diffUtil)
 
-    var forecastList: List<Forecast>
+    var forecastList: List<HourlyForecast>
         get() = recyclerListDiffer.currentList
         set(value) = recyclerListDiffer.submitList(value)
 
@@ -45,6 +44,6 @@ class HourlyForecastRecyclerAdapter : RecyclerView.Adapter<HourlyForecastRecycle
     }
 
     override fun onBindViewHolder(holder: HourlyForecastViewHolder, position: Int) {
-        holder.binding.forecast =forecastList[position]
+        holder.binding.forecast = forecastList[position]
     }
 }

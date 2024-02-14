@@ -1,6 +1,6 @@
 package com.ugurbayrak.weatherapp.domain.model
 
-data class Forecast(
+data class HourlyForecast(
     val temp: String,
     val pop: String,
     val dtTxt: String,

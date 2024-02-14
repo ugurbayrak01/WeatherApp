@@ -118,6 +118,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/weatherLinearLayout" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dailyForecastRecyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/rounded_corner_background"
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hourlyForecastRecyclerview" />
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"

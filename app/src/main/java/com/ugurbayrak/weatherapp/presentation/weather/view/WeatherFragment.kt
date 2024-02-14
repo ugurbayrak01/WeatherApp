@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ugurbayrak.weatherapp.databinding.FragmentWeatherBinding
+import com.ugurbayrak.weatherapp.presentation.adapter.DailyForecastRecyclerAdapter
 import com.ugurbayrak.weatherapp.presentation.adapter.HourlyForecastRecyclerAdapter
 import com.ugurbayrak.weatherapp.presentation.weather.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,6 +24,7 @@ class WeatherFragment @Inject constructor() : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: WeatherViewModel
     private var hourlyForecastRecyclerAdapter = HourlyForecastRecyclerAdapter()
+    private var dailyForecastRecyclerAdapter = DailyForecastRecyclerAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,6 +47,8 @@ class WeatherFragment @Inject constructor() : Fragment() {
                     LinearLayoutManager.HORIZONTAL,
                     false
                 )
+                dailyForecastRecyclerview.adapter = dailyForecastRecyclerAdapter
+                dailyForecastRecyclerview.layoutManager = LinearLayoutManager(requireContext())
             }
             collectFlow()
         }
@@ -57,6 +61,7 @@ class WeatherFragment @Inject constructor() : Fragment() {
                     progressBar.visibility = View.VISIBLE
                     weatherLinearLayout.visibility = View.GONE
                     hourlyForecastRecyclerview.visibility = View.GONE
+                    dailyForecastRecyclerview.visibility = View.GONE
                 }
             } else if(weatherState.error.isNotEmpty()) {
                 Toast.makeText(requireContext(), weatherState.error, Toast.LENGTH_SHORT).show()
@@ -64,6 +69,7 @@ class WeatherFragment @Inject constructor() : Fragment() {
                     progressBar.visibility = View.GONE
                     weatherLinearLayout.visibility = View.GONE
                     hourlyForecastRecyclerview.visibility = View.GONE
+                    dailyForecastRecyclerview.visibility = View.GONE
                 }
             } else {
                 binding.apply {
@@ -71,8 +77,10 @@ class WeatherFragment @Inject constructor() : Fragment() {
                     progressBar.visibility = View.GONE
                     weatherLinearLayout.visibility = View.VISIBLE
                     hourlyForecastRecyclerview.visibility = View.VISIBLE
+                    dailyForecastRecyclerview.visibility = View.VISIBLE
                 }
-                hourlyForecastRecyclerAdapter.forecastList = weatherState.forecast
+                hourlyForecastRecyclerAdapter.forecastList = weatherState.hourlyForecast
+                dailyForecastRecyclerAdapter.forecastList = weatherState.dailyForecast
             }
         }.launchIn(lifecycleScope)
     }
