@@ -7,7 +7,9 @@ import com.ugurbayrak.weatherapp.domain.model.HourlyForecast
 import com.ugurbayrak.weatherapp.domain.model.Weather
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 fun WeatherResponse.toWeather() : Weather {
     return Weather(
@@ -17,11 +19,11 @@ fun WeatherResponse.toWeather() : Weather {
         tempMax = formatTemperature(main.tempMax),
         tempMin = formatTemperature(main.tempMin),
         name = formatString(name),
-        sunrise = sys.sunrise,
-        sunset = sys.sunset,
+        sunrise = getEpochTime(sys.sunrise),
+        sunset = getEpochTime(sys.sunset),
         description = formatString(weather[0].description),
         icon = get4xIconUrl(weather[0].icon),
-        speed = wind.speed
+        speed = formatWindSpeed(wind.speed)
     )
 }
 
@@ -29,7 +31,7 @@ fun ForecastResponse.toHourlyForecast() : List<HourlyForecast> {
     return list.map {
         HourlyForecast(
             temp = formatTemperature(it.main.temp),
-            pop = "%" + (it.pop * 100).toInt().toString(),
+            pop = formatPop(it.pop),
             dtTxt = getHour(it.dt_txt),
             icon = get2xIconUrl(it.weather[0].icon)
         )
@@ -51,7 +53,7 @@ fun ForecastResponse.toDailyForecast() : List<DailyForecast> {
         DailyForecast(
             tempMin = formatTemperature(it.tempMin),
             tempMax = formatTemperature(it.tempMax),
-            pop = "%" + (it.pop * 100).toInt().toString(),
+            pop = formatPop(it.pop),
             day = getDayOfWeek(it.dtTxt),
             icon = get2xIconUrl(it.icon),
             iconNight = get2xIconUrl(it.iconNight),
@@ -118,6 +120,10 @@ private fun get2xIconUrl(icon: String) = "https://openweathermap.org/img/wn/${ic
 
 private fun get4xIconUrl(icon: String) = "https://openweathermap.org/img/wn/${icon}@4x.png"
 
+private fun formatWindSpeed(speed: Double) = (speed * 3.6).toInt().toString() + " km/h"
+
+private fun formatPop(pop: Double) = "%" + (pop * 100).toInt().toString()
+
 private fun formatTemperature(temp: Double) : String {
     val tempString = temp.toInt().toString()
     return "$tempString\u00B0"
@@ -135,4 +141,14 @@ private fun getHour(date: String) : String{
     var hour = date.substringAfter(" ").trim()
     hour = hour.substring(0, minOf(5, hour.length))
     return hour
+}
+
+private fun getEpochTime(epoch: Long) : String{
+    val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+    val epochDate = Date(epoch * 1000)
+    dateFormat.timeZone = TimeZone.getDefault()
+
+    return dateFormat.format(epochDate)
 }

@@ -7,9 +7,9 @@ data class Weather(
     val tempMax: String,
     val tempMin: String,
     val name: String,
-    val sunrise: Int,
-    val sunset: Int,
+    val sunrise: String,
+    val sunset: String,
     val description: String,
     val icon: String,
-    val speed: Double
+    val speed: String
 )
