@@ -70,24 +70,29 @@
             android:layout_height="32dp"
             android:background="#00000000"
             android:download_icon="@{forecast.iconNight}"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="4dp"
             android:layout_weight="1" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="20dp"
             android:background="#00000000"
             android:text="@{forecast.tempMax}"
             android:textSize="14sp"
             android:layout_marginEnd="2dp"
+            android:gravity="end"
             android:layout_weight="1" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="20dp"
             android:background="#00000000"
             android:text="@{forecast.tempMin}"
             android:textSize="14sp"
+            android:gravity="end"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1" />
     </LinearLayout>
 </layout>
