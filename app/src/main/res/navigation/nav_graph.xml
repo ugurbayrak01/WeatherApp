@@ -9,14 +9,5 @@
         android:id="@+id/weatherFragment"
         android:name="com.ugurbayrak.weatherapp.presentation.weather.view.WeatherFragment"
         android:label=""
-        tools:layout="@layout/fragment_weather" >
-        <action
-            android:id="@+id/action_weatherFragment_to_mapsFragment"
-            app:destination="@id/mapsFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/mapsFragment"
-        android:name="com.ugurbayrak.weatherapp.presentation.maps.view.MapsFragment"
-        android:label=""
-        tools:layout="@layout/fragment_maps" />
+        tools:layout="@layout/fragment_weather" />
 </navigation>

@@ -11,16 +11,16 @@ import retrofit2.http.Query
 interface WeatherAPI {
     @GET("/data/2.5/weather")
     suspend fun getWeatherByLatLon(
-        @Query("lat") lat: Double = 36.5700117,
-        @Query("lon") lon: Double = 35.3904988,
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
         @Query("units") units: String = UNITS,
         @Query("appid") appId: String = API_KEY
     ) : Response<WeatherResponse>
 
     @GET("/data/2.5/forecast")
     suspend fun getForecastByLatLon(
-        @Query("lat") lat: Double = 36.5700117,
-        @Query("lon") lon: Double = 35.3904988,
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
         @Query("units") units: String = UNITS,
         @Query("appid") appId: String = API_KEY
     ) : Response<ForecastResponse>

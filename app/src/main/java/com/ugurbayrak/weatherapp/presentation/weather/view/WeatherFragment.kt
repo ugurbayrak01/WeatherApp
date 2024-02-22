@@ -11,6 +11,13 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.ktx.widget.PlaceSelectionError
+import com.google.android.libraries.places.ktx.widget.PlaceSelectionSuccess
+import com.google.android.libraries.places.ktx.widget.placeSelectionEvents
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.ugurbayrak.weatherapp.R
 import com.ugurbayrak.weatherapp.databinding.FragmentWeatherBinding
 import com.ugurbayrak.weatherapp.presentation.adapter.DailyForecastRecyclerAdapter
 import com.ugurbayrak.weatherapp.presentation.adapter.HourlyForecastRecyclerAdapter
@@ -21,8 +28,10 @@ import com.ugurbayrak.weatherapp.util.Constants.PACKAGE_NAME
 import com.ugurbayrak.weatherapp.util.Constants.PREFS_LATITUDE
 import com.ugurbayrak.weatherapp.util.Constants.PREFS_LONGITUDE
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 @AndroidEntryPoint
 class WeatherFragment @Inject constructor() : Fragment() {
@@ -42,6 +51,7 @@ class WeatherFragment @Inject constructor() : Fragment() {
         return binding.root
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[WeatherViewModel::class.java]
@@ -65,6 +75,34 @@ class WeatherFragment @Inject constructor() : Fragment() {
             )
 
             collectFlow()
+        }
+
+        Places.initialize(requireContext(), getString(R.string.google_maps_key))
+
+        val autocompleteFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.autocomplete_fragment)
+                as AutocompleteSupportFragment
+        autocompleteFragment.setPlaceFields(
+            listOf(Place.Field.NAME, Place.Field.ID, Place.Field.LAT_LNG, Place.Field.ADDRESS)
+        )
+
+        lifecycleScope.launch {
+            autocompleteFragment.placeSelectionEvents().collect { event ->
+                when (event) {
+                    is PlaceSelectionSuccess -> {
+                        val latitude = event.place.latLng?.latitude
+                        val longitude = event.place.latLng?.longitude
+
+                        sharedPrefs.edit().putString(PREFS_LATITUDE,latitude.toString()).apply()
+                        sharedPrefs.edit().putString(PREFS_LONGITUDE,longitude.toString()).apply()
+
+                        viewModel.getWeatherByLatLon(
+                            getLatitudeFromSharedPreferences(),
+                            getLongitudeFromSharedPreferences()
+                        )
+                    }
+                    is PlaceSelectionError -> {}
+                }
+            }
         }
     }
 
