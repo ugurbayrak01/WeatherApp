@@ -67,6 +67,14 @@ class WeatherFragment @Inject constructor() : Fragment() {
                 )
                 dailyForecastRecyclerview.adapter = dailyForecastRecyclerAdapter
                 dailyForecastRecyclerview.layoutManager = LinearLayoutManager(requireContext())
+
+                swipeRefreshLayout.setOnRefreshListener {
+                    swipeRefreshLayout.isRefreshing = false
+                    viewModel.getWeatherByLatLon(
+                        getLatitudeFromSharedPreferences(),
+                        getLongitudeFromSharedPreferences()
+                    )
+                }
             }
 
             viewModel.getWeatherByLatLon(
